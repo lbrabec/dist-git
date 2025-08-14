@@ -1,6 +1,6 @@
 %{!?_release: %define _release 1}
 %{!?CUDA: %define CUDA /usr/local/cuda}
-%{!?GDR_VERSION: %define GDR_VERSION 2.0}
+%{!?GDR_VERSION: %define GDR_VERSION 2.5}
 %{!?KVERSION: %define KVERSION %(uname -r)}
 %{!?MODULE_LOCATION: %define MODULE_LOCATION /kernel/drivers/misc/}
 %{!?NVIDIA_DRIVER_VERSION: %define NVIDIA_DRIVER_VERSION UNKNOWN}
@@ -106,8 +106,11 @@ Summary:        GDRcopy library and companion kernel-mode driver
 Group:          System Environment/Libraries
 License:        MIT
 URL:            https://github.com/NVIDIA/gdrcopy
-Source0:        %{name}-%{version}.tar.gz
-BuildRequires:  gcc kernel-headers
+Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Source1:        dkms.conf
+Source2:        gdrcopy
+Source3:        gdrcopy.service
+BuildRequires:  gcc kernel-headers gcc-g++
 
 %package devel
 Summary: The development files
@@ -160,14 +163,14 @@ Kernel-mode driver for GDRCopy built for GPU driver %{NVIDIA_DRIVER_VERSION} and
 
 %build
 echo "building"
-make -j8 CUDA=%{CUDA} config lib exes
+make -j8 CUDA=%{CUDA} config lib
 %if %{BUILD_KMOD} > 0
 make -j8 NVIDIA_SRC_DIR=%{NVIDIA_SRC_DIR} driver
 %endif
 
 %install
 # Install gdrcopy library and tests
-make install DESTDIR=$RPM_BUILD_ROOT prefix=%{_prefix} libdir=%{_libdir}
+make lib_install DESTDIR=$RPM_BUILD_ROOT prefix=%{_prefix} libdir=%{_libdir}
 
 %if %{BUILD_KMOD} > 0
 # Install gdrdrv driver
@@ -181,7 +184,7 @@ cp -a $RPM_BUILD_DIR/%{name}-%{version}/src/gdrdrv/gdrdrv.c $RPM_BUILD_ROOT%{usr
 cp -a $RPM_BUILD_DIR/%{name}-%{version}/src/gdrdrv/gdrdrv.h $RPM_BUILD_ROOT%{usr_src_dir}/gdrdrv-%{version}/
 cp -a $RPM_BUILD_DIR/%{name}-%{version}/src/gdrdrv/Makefile $RPM_BUILD_ROOT%{usr_src_dir}/gdrdrv-%{version}/
 cp -a $RPM_BUILD_DIR/%{name}-%{version}/src/gdrdrv/nv-p2p-dummy.c $RPM_BUILD_ROOT%{usr_src_dir}/gdrdrv-%{version}/
-cp -a $RPM_BUILD_DIR/%{name}-%{version}/dkms.conf $RPM_BUILD_ROOT%{usr_src_dir}/gdrdrv-%{version}
+cp -a %{SOURCE1} $RPM_BUILD_ROOT%{usr_src_dir}/gdrdrv-%{version}
 cp -a -r $RPM_BUILD_DIR/%{name}-%{version}/scripts $RPM_BUILD_ROOT%{usr_src_dir}/gdrdrv-%{version}/
 
 %if 0%{!?suse_version:1}
@@ -190,14 +193,14 @@ cp -a -r $RPM_BUILD_DIR/%{name}-%{version}/scripts $RPM_BUILD_ROOT%{usr_src_dir}
 %if 0%{?rhel} >= 9
 # Install systemd service
 install -d $RPM_BUILD_ROOT/usr/libexec/gdrcopy
-install -m 0755 $RPM_BUILD_DIR/%{name}-%{version}/init.d/gdrcopy $RPM_BUILD_ROOT/usr/libexec/gdrcopy
+install -m 0755 %{SOURCE2} $RPM_BUILD_ROOT/usr/libexec/gdrcopy
 install -d $RPM_BUILD_ROOT/usr/lib/systemd/system
-install -m 0644 $RPM_BUILD_DIR/%{name}-%{version}/gdrcopy.service $RPM_BUILD_ROOT/usr/lib/systemd/system
+install -m 0644 %{SOURCE3} $RPM_BUILD_ROOT/usr/lib/systemd/system
 %else
 # RHEL8 or earlier
 # Install gdrdrv service script
 install -d $RPM_BUILD_ROOT/etc/init.d
-install -m 0755 $RPM_BUILD_DIR/%{name}-%{version}/init.d/gdrcopy $RPM_BUILD_ROOT/etc/init.d
+install -m 0755 %{SOURCE2} $RPM_BUILD_ROOT/etc/init.d
 %endif
 
 %else # SUSE
@@ -305,15 +308,6 @@ rm -rf $RPM_BUILD_DIR/%{name}-%{version}
 
 
 %files
-%{_prefix}/bin/apiperf
-%{_prefix}/bin/copybw
-%{_prefix}/bin/copylat
-%{_prefix}/bin/sanity
-%{_prefix}/bin/gdrcopy_apiperf
-%{_prefix}/bin/gdrcopy_copybw
-%{_prefix}/bin/gdrcopy_copylat
-%{_prefix}/bin/gdrcopy_sanity
-%{_prefix}/bin/gdrcopy_pplat
 %{_libdir}/libgdrapi.so.?.?
 %{_libdir}/libgdrapi.so.?
 %{_libdir}/libgdrapi.so
