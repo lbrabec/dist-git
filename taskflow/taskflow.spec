@@ -2,11 +2,13 @@
 %global debug_package %{nil}
 
 %global forgeurl https://github.com/taskflow/taskflow
-Version: 3.4.0
+
+%bcond_with bundled_doctest
+Version: 3.10.0
 %forgemeta
 
 Name: taskflow
-Release: %{autorelease}
+Release: 1%{?dist}
 # Most of the package is MIT
 # taskflow/utility/uuid.hpp: BSL-1.0
 # taskflow/core/notifier.hpp: MPL-2.0
@@ -24,7 +26,9 @@ Source1: generate-tarball.sh
 
 BuildRequires: cmake
 BuildRequires: gcc-c++
+%if %{with bundled_doctest}
 BuildRequires: doctest-devel
+%endif
 
 %global _description %{expand:
 Taskflow is a C++ header library which helps you quickly write parallel and
@@ -57,6 +61,8 @@ if [ -n "$pdfs" ]; then
     exit 1
 fi
 
+
+%if %{with bundled_doctest}
 # Most of these bundled libraries are only used by code in sandbox/, thus the
 # bundled code can be removed.
 rm -fr 3rd-party
@@ -65,6 +71,11 @@ sed -i \
     -e 's,include(.*/doctest.cmake),include(%{_libdir}/cmake/doctest/doctest.cmake),' \
     -e 's,\${TF_3RD_PARTY_DIR}/doctest,%{_includedir}/doctest,' \
     unittests/CMakeLists.txt
+%else
+# Delete all bundled, but keep doctest
+ls 3rd-party | grep -v doctest | xargs -I '{}' rm -rf '3rd-party/{}'
+%endif
+
 
 %build
 %cmake
@@ -98,4 +109,5 @@ rm -rf html/xml
 %doc html
 
 %changelog
-%autochangelog
+* Mon Aug 18 2025 Lukas Brabec <lbrabec@redhat.com> - 3.10.0-1
+- test build
