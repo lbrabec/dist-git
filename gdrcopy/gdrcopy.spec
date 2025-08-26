@@ -6,6 +6,7 @@
 %{!?NVIDIA_DRIVER_VERSION: %define NVIDIA_DRIVER_VERSION UNKNOWN}
 %{!?NVIDIA_SRC_DIR: %define NVIDIA_SRC_DIR UNDEFINED}
 %{!?BUILD_KMOD: %define BUILD_KMOD 0}
+%{!?BUILD_DKMS: %define BUILD_DKMS 0}
 %global debug_package %{nil}
 %global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
 %define MODPROBE %(if ( /sbin/modprobe -c | grep -q '^allow_unsupported_modules  *0'); then echo -n "/sbin/modprobe --allow-unsupported-modules"; else echo -n "/sbin/modprobe"; fi )
@@ -107,10 +108,13 @@ Group:          System Environment/Libraries
 License:        MIT
 URL:            https://github.com/NVIDIA/gdrcopy
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+%if %{BUILD_DKMS} > 0
 Source1:        dkms.conf
 Source2:        gdrcopy
 Source3:        gdrcopy.service
-BuildRequires:  gcc kernel-headers gcc-g++
+BuildRequires:  kernel-headers
+%endif
+BuildRequires:  gcc gcc-g++
 
 %package devel
 Summary: The development files
@@ -177,6 +181,7 @@ make lib_install DESTDIR=$RPM_BUILD_ROOT prefix=%{_prefix} libdir=%{_libdir}
 make drv_install DESTDIR=$RPM_BUILD_ROOT NVIDIA_SRC_DIR=%{NVIDIA_SRC_DIR}
 %endif
 
+%if %{BUILD_DKMS} > 0
 # Install gdrdrv src
 mkdir -p $RPM_BUILD_ROOT%{usr_src_dir}
 mkdir -p $RPM_BUILD_ROOT%{usr_src_dir}/gdrdrv-%{version}
@@ -186,10 +191,12 @@ cp -a $RPM_BUILD_DIR/%{name}-%{version}/src/gdrdrv/Makefile $RPM_BUILD_ROOT%{usr
 cp -a $RPM_BUILD_DIR/%{name}-%{version}/src/gdrdrv/nv-p2p-dummy.c $RPM_BUILD_ROOT%{usr_src_dir}/gdrdrv-%{version}/
 cp -a %{SOURCE1} $RPM_BUILD_ROOT%{usr_src_dir}/gdrdrv-%{version}
 cp -a -r $RPM_BUILD_DIR/%{name}-%{version}/scripts $RPM_BUILD_ROOT%{usr_src_dir}/gdrdrv-%{version}/
+%endif
 
 %if 0%{!?suse_version:1}
 # RHEL
 
+%if %{BUILD_DKMS} > 0
 %if 0%{?rhel} >= 9
 # Install systemd service
 install -d $RPM_BUILD_ROOT/usr/libexec/gdrcopy
@@ -201,6 +208,7 @@ install -m 0644 %{SOURCE3} $RPM_BUILD_ROOT/usr/lib/systemd/system
 # Install gdrdrv service script
 install -d $RPM_BUILD_ROOT/etc/init.d
 install -m 0755 %{SOURCE2} $RPM_BUILD_ROOT/etc/init.d
+%endif
 %endif
 
 %else # SUSE
@@ -214,6 +222,7 @@ EOF
 chmod 0644 $RPM_BUILD_ROOT/etc/modprobe.d/50-gdrdrv.conf
 %endif
 
+%if %{BUILD_DKMS} > 0
 %post %{dkms}
 if [ "$1" == "2" ] && [ -e "%{old_driver_install_dir}/gdrdrv.ko" ]; then
     echo "Old package is detected. Defer installation until after the old package is removed."
@@ -230,6 +239,7 @@ if [ ! -e "%{_localstatedir}/lib/rpm-state/gdrcopy-dkms/installed" ]; then
     mkdir -p %{_localstatedir}/lib/rpm-state/gdrcopy-dkms
     touch %{_localstatedir}/lib/rpm-state/gdrcopy-dkms/installed
 fi
+%endif
 
 
 %if %{BUILD_KMOD} > 0
@@ -239,6 +249,7 @@ fi
 %endif
 
 
+%if %{BUILD_DKMS} > 0
 %preun %{dkms}
 %{gdrcopy_service_uninstall_script}
 
@@ -251,6 +262,7 @@ dkms remove -m gdrdrv -v %{version} -q --all --rpm_safe_upgrade || :
 # Clean up the weak-updates symlinks
 find /lib/modules/*/weak-updates -name "gdrdrv.ko.*" -delete &> /dev/null || :
 find /lib/modules/*/weak-updates -name "gdrdrv.ko" -delete &> /dev/null || :
+%endif
 
 
 %if %{BUILD_KMOD} > 0
@@ -258,8 +270,10 @@ find /lib/modules/*/weak-updates -name "gdrdrv.ko" -delete &> /dev/null || :
 %{gdrcopy_service_uninstall_script}
 %endif
 
+%if %{BUILD_DKMS} > 0
 %postun %{dkms}
 %{daemon_reload_script}
+%endif
 
 %if %{BUILD_KMOD} > 0
 %postun %{kmod_fullname}
@@ -267,6 +281,7 @@ find /lib/modules/*/weak-updates -name "gdrdrv.ko" -delete &> /dev/null || :
 %endif
 
 
+%if %{BUILD_DKMS} > 0
 %triggerpostun %{dkms} -- gdrcopy-kmod <= 2.1-1
 %{dkms_install_script}
 
@@ -300,7 +315,7 @@ service gdrcopy start > /dev/null 2>&1 ||:
 if [ -e "%{_localstatedir}/lib/rpm-state/gdrcopy-dkms/installed" ]; then
     rm -f %{_localstatedir}/lib/rpm-state/gdrcopy-dkms/installed
 fi
-
+%endif
 
 %clean
 rm -rf $RPM_BUILD_DIR/%{name}-%{version}
@@ -319,6 +334,7 @@ rm -rf $RPM_BUILD_DIR/%{name}-%{version}
 %doc README.md
 
 
+%if %{BUILD_DKMS} > 0
 %files %{dkms}
 %defattr(-,root,root,-)
 %if 0%{!?suse_version:1}
@@ -337,6 +353,7 @@ rm -rf $RPM_BUILD_DIR/%{name}-%{version}
 %{usr_src_dir}/gdrdrv-%{version}/nv-p2p-dummy.c
 %{usr_src_dir}/gdrdrv-%{version}/dkms.conf
 %{usr_src_dir}/gdrdrv-%{version}/scripts/*
+%endif
 
 
 %if %{BUILD_KMOD} > 0
