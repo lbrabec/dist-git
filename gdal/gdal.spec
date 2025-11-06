@@ -299,6 +299,8 @@ cp -p %SOURCE4 .
 
 
 %build
+%global __global_cxxflags %{__global_cxxflags} -std=gnu++14
+
 # For future reference:
 # epsilon: Stalled review -- https://bugzilla.redhat.com/show_bug.cgi?id=660024
 # Building without pgeo driver, because it drags in Java
