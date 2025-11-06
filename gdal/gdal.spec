@@ -52,7 +52,7 @@ URL:           http://www.gdal.org
 # See PROVENANCE.TXT-fedora and the cleaner script for details!
 
 Source0:       %{name}-%{version}-fedora.tar.xz
-Source1:       http://download.osgeo.org/%{name}/%{testversion}/%{name}autotest-%{testversion}.tar.gz
+Source1:       https://download.osgeo.org/%{name}/%{testversion}/%{name}autotest-%{testversion}.tar.gz
 
 # Cleaner script for the tarball
 Source3:       %{name}-cleaner.sh
