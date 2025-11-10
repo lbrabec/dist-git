@@ -29,6 +29,8 @@
 %bcond_without have_re2
 %bcond_without have_utf8proc
 
+%bcond_with python
+
 Name:		libarrow
 Version:	17.0.0
 Release:	8%{?dist}
@@ -36,7 +38,8 @@ Summary:	A toolbox for accelerated data interchange and in-memory processing
 License:	Apache-2.0
 URL:		https://arrow.apache.org/
 Requires:	%{name}-doc = %{version}-%{release}
-Source0:	https://dist.apache.org/repos/dist/release/arrow/arrow-%{version}/apache-arrow-%{version}.tar.gz
+#Source0:	https://dist.apache.org/repos/dist/release/arrow/arrow-%{version}/apache-arrow-%{version}.tar.gz
+Source0:	https://github.com/apache/arrow/releases/download/apache-arrow-%{version}/apache-arrow-%{version}.tar.gz
 Patch0001:	0001-python-pyarrow-tests-read_record_patch.py.patch
 Patch0002:	0002-python-pyarrow-tests-test_ipc.py.patch
 
@@ -67,6 +70,7 @@ BuildRequires:	libzstd-devel
 BuildRequires:	lz4-devel
 BuildRequires:	openssl-devel
 BuildRequires:	pkgconfig
+%if %{with python}
 BuildRequires:	python%{python3_pkgversion}-devel
 BuildRequires:	python%{python3_pkgversion}-numpy
 BuildRequires:	python%{python3_pkgversion}-Cython
@@ -74,6 +78,7 @@ BuildRequires:	python%{python3_pkgversion}-pandas
 BuildRequires:	python%{python3_pkgversion}-pytest
 BuildRequires:	python%{python3_pkgversion}-hypothesis
 BuildRequires:	python%{python3_pkgversion}-pytzdata
+%endif
 BuildRequires:	xsimd-devel
 BuildRequires:	abseil-cpp-devel
 BuildRequires:	c-ares-devel
@@ -97,8 +102,10 @@ BuildRequires:	ncurses-devel
 BuildRequires:	gobject-introspection-devel
 BuildRequires:	gtk-doc
 
+%if %{with python}
 # Additional pyarrow build requirements; see also %%generate_buildrequires
 BuildRequires:  python3dist(cffi)
+%endif
 
 # python3-pyarrow provides bogus library SONAME provides
 # https://bugzilla.redhat.com/show_bug.cgi?id=2326774
@@ -114,11 +121,12 @@ fast data access without serialization overhead
 
 %files
 %{_libdir}/libarrow.so.*
+%if %{with python}
 %exclude %{python3_sitearch}/benchmarks/*
 %exclude %{python3_sitearch}/cmake_modules/*
 %exclude %{python3_sitearch}/examples/*
 %exclude %{python3_sitearch}/scripts/*
-
+%endif
 
 #--------------------------------------------------------------------
 
@@ -327,6 +335,7 @@ Libraries and header files for Gandiva.
 %{_libdir}/pkgconfig/gandiva.pc
 %endif
 
+%if %{with python}
 #--------------------------------------------------------------------
 
 %package python-libs
@@ -391,6 +400,10 @@ Apache Arrow Flight.
 %files python-flight-devel
 %{python3_sitearch}/pyarrow/include/arrow/python/flight.h
 %endif
+
+# endif with python
+%endif
+
 
 %if %{with use_plasma}
 #--------------------------------------------------------------------
@@ -662,6 +675,8 @@ Libraries and header files for Apache Parquet GLib.
 
 #--------------------------------------------------------------------
 
+%if %{with python}
+
 %package -n python3-pyarrow
 Summary: Python library for Apache Arrow
 
@@ -686,6 +701,8 @@ Development files for python3-pyarrow
 %{python3_sitearch}/pyarrow/lib_api.h
 %{python3_sitearch}/pyarrow/include
 
+%endif
+
 #--------------------------------------------------------------------
 
 %prep
@@ -693,11 +710,13 @@ Development files for python3-pyarrow
 # We do not need to (nor can we) build for an old version of numpy:
 sed -r -i 's/(oldest-supported-)(numpy)/\2/' python/pyproject.toml
 
+%if %{with python}
 %generate_buildrequires
 pushd python >/dev/null
 export SETUPTOOLS_SCM_VERSION_WRITE_TO_PREFIX="python"
 %pyproject_buildrequires
 popd >/dev/null
+%endif
 
 %build
 pushd cpp
@@ -756,6 +775,8 @@ pushd c_glib
 %meson_build
 popd
 
+
+%if %{with python}
 # hack alert. install libarrow somewhere (temporary) so that python
 # (i.e. pyarrow) can build against it. If someone knows how to invoke
 # cmake or # pyproject_wheel using the bits in ../cpp instead, that
@@ -781,16 +802,19 @@ export \
 %pyproject_wheel
 popd
 rm -rf /tmp%{_prefix}
+%endif
 
 #--------------------------------------------------------------------
 
 %install
 
+%if %{with python}
 pushd python
 export PYARROW_INSTALL_TESTS=0
 %pyproject_install
 %pyproject_save_files pyarrow
 popd
+%endif
 
 pushd c_glib
 %meson_install
@@ -809,6 +833,7 @@ export LD_LIBRARY_PATH='%{buildroot}%{_libdir}'
 #
 # Additionally, skip subpackages corresponding to missing optional
 # functionality.
+%if %{with python}
 %{pyproject_check_import \
     -e 'pyarrow.conftest' \
     -e 'pyarrow.orc' -e 'pyarrow._orc' \
@@ -820,7 +845,7 @@ export LD_LIBRARY_PATH='%{buildroot}%{_libdir}'
     -e 'pyarrow.libarrow_python_parquet_encryption' \
     -e 'pyarrow.tests.read_record_batch' -e 'pyarrow.tests.test_cuda' \
     -e 'pyarrow.tests.test_cuda_numba_interop' -e 'pyarrow.tests.test_jvm'}
-
+%endif
 
 
 #--------------------------------------------------------------------
@@ -877,7 +902,7 @@ export LD_LIBRARY_PATH='%{buildroot}%{_libdir}'
 
 * Tue Mar 19 2024  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 15.0.2-1
 - Arrow 15.0.2 GA
-- Note: The ABI break reported https://github.com/apache/arrow/issues/40604 
+- Note: The ABI break reported https://github.com/apache/arrow/issues/40604
   (bz 2269811) does NOT appear to be addressed in this release.
 
 * Fri Mar 15 2024  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 15.0.1-1
