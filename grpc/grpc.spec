@@ -17,6 +17,8 @@
 #global gtest_dir googletest-release-#{gtest_version}
 %bcond system_gtest        0
 
+%bcond_with python
+
 # =====
 
 # Parameters for third-party sources needed for their .proto files, which
@@ -234,6 +236,7 @@ BuildRequires:  gdb
 %endif
 %endif
 
+%if %{with python}
 # ~~~~ Python ~~~~
 
 BuildRequires:  python3-devel
@@ -297,8 +300,13 @@ BuildRequires:  python3dist(requests) >= 2.14.2
 BuildRequires:  python3dist(gevent)
 %endif
 
+%endif
+
 # For stopping the port server
 BuildRequires:  curl
+%if %{with core_tests}
+BuildRequires:  python3dist(six) >= 1.10
+%endif
 
 # ~~~~ Miscellaneous ~~~~
 
@@ -628,7 +636,7 @@ Requires:       pkgconfig(zlib)
 %description devel
 Development headers and files for gRPC libraries (both C and C++).
 
-
+%if %{with python}
 %package -n python3-grpcio
 Summary:        Python language bindings for gRPC
 # License:        same as base package
@@ -759,6 +767,7 @@ gRPC Python Testing Package
 
 Testing utilities for gRPC Python.
 
+%endif
 
 %prep
 %autosetup -p1 -n grpc-%{srcversion}
@@ -948,6 +957,8 @@ echo '===== Building C (core) and C++ components =====' 2>&1
 %cmake_build
 # ~~~~ Python ~~~~
 
+%if %{with python}
+
 echo '===== Building Python grpcio package =====' 2>&1
 # Since there are some interdependencies in the Python packages (e.g., many
 # have setup_requires: grpcio-tools), we do temporary installs of built
@@ -1029,6 +1040,7 @@ do
   popd >/dev/null
 done
 
+%endif
 
 %install
 # ~~~~ C (core) and C++ (cpp) ~~~~
@@ -1060,6 +1072,8 @@ find %{buildroot} -type f -name '*.a' -print -delete
 find %{buildroot}%{_includedir}/grpc* -type f -name '*.h' -perm /0111 \
     -execdir chmod -v a-x '{}' '+'
 
+
+%if %{with python}
 # ~~~~ Python ~~~~
 
 # Since several packages have an install_requires: grpcio-tools, we must ensure
@@ -1089,6 +1103,8 @@ do
 done
 # The grpcio_tests package should not be installed; it would provide top-level
 # packages with generic names like “tests” or “tests_aio”.
+
+%endif
 
 # ~~~~ Miscellaneous ~~~~
 
@@ -1168,6 +1184,11 @@ ssl_transport_security
 
 # Seems to require privilege:
 flaky_network
+
+# Failed accept4: Too many open files
+# terminate called after throwing an instance of 'std::runtime_error'
+#   what():  random_device::random_device(const std::string&): device not available
+client_channel_stress
 
 %ifarch s390x
 # Unexplained:
@@ -1591,6 +1612,7 @@ EOF
 curl "http://localhost:${PORT_SERVER_PORT}/quitquitquit" || :
 %endif
 
+%if %{with python}
 pushd src/python/grpcio_tests
 for suite in \
     test_lite \
@@ -1606,6 +1628,7 @@ do
       %{python3} %{py_setup} %{?py_setup_args} "${suite}"
 done
 popd
+%endif
 
 %endif
 
@@ -1705,7 +1728,7 @@ fi
 %{_libdir}/libgrpcpp_channelz.so
 %{_includedir}/grpcpp/
 
-
+%if %{with python}
 %files -n python3-grpcio
 %license LICENSE NOTICE.txt LICENSE-utf8_range
 %{python3_sitearch}/grpc/
@@ -1741,7 +1764,7 @@ fi
 %files -n python3-grpcio-testing
 %{python3_sitelib}/grpc_testing/
 %{python3_sitelib}/grpcio_testing-%{pyversion}-py%{python3_version}.egg-info/
-
+%endif
 
 %changelog
 %autochangelog
