@@ -28,7 +28,7 @@
 %global spatialite "--with-spatialite"
 %endif
 
-%bcond_without python3
+%bcond_with python3
 # No complete java yet in EL8
 %if 0%{?rhel} == 8
 %bcond_with java
@@ -414,6 +414,9 @@ cp -a %{SOURCE4} .
   -DGDAL_JAVA_INSTALL_DIR=%{_jnidir}/%{name} \
   -DGDAL_JAVA_JNI_INSTALL_DIR=%{_jnidir}/%{name} \
   -DGDAL_USE_JPEG12_INTERNAL=OFF \
+%if %{without python}
+  -DBUILD_PYTHON_BINDINGS=OFF \
+%endif
   -DENABLE_DEFLATE64=OFF
 %cmake_build
 
@@ -465,21 +468,14 @@ cp -a %{SOURCE3} %{buildroot}%{_bindir}/%{name}-config
 %endif
 
 
-%files -f gdal_python_manpages_excludes.txt
+%files %{?with_python:-f gdal_python_manpages_excludes.txt}
 %{_bindir}/8211*
-%{_bindir}/gdal2tiles
-%{_bindir}/gdal2xyz
 %{_bindir}/gdaladdo
-%{_bindir}/gdalattachpct
 %{_bindir}/gdalbuildvrt
-%{_bindir}/gdal_calc
-%{_bindir}/gdalcompare
 %{_bindir}/gdal_contour
 %{_bindir}/gdal_create
 %{_bindir}/gdaldem
-%{_bindir}/gdal_edit
 %{_bindir}/gdalenhance
-%{_bindir}/gdal_fillnodata
 %{_bindir}/gdal_footprint
 %{_bindir}/gdal_grid
 %{_bindir}/gdalinfo
@@ -487,14 +483,7 @@ cp -a %{SOURCE3} %{buildroot}%{_bindir}/%{name}-config
 %{_bindir}/gdalmanage
 %{_bindir}/gdalmdiminfo
 %{_bindir}/gdalmdimtranslate
-%{_bindir}/gdal_merge
-%{_bindir}/gdalmove
-%{_bindir}/gdal_pansharpen
-%{_bindir}/gdal_polygonize
-%{_bindir}/gdal_proximity
 %{_bindir}/gdal_rasterize
-%{_bindir}/gdal_retile
-%{_bindir}/gdal_sieve
 %{_bindir}/gdalsrsinfo
 %{_bindir}/gdaltindex
 %{_bindir}/gdaltransform
@@ -506,18 +495,34 @@ cp -a %{SOURCE3} %{buildroot}%{_bindir}/%{name}-config
 %{_bindir}/nearblack
 %{_bindir}/ogr2ogr
 %{_bindir}/ogrinfo
-%{_bindir}/ogr_layer_algebra
 %{_bindir}/ogrlineref
-%{_bindir}/ogrmerge
 %{_bindir}/ogrtindex
-%{_bindir}/pct2rgb
-%{_bindir}/rgb2pct
 %{_bindir}/s57dump
 %{_bindir}/sozip
 %{_datadir}/bash-completion/completions/*
 %exclude %{_datadir}/bash-completion/completions/*.py
 %{_mandir}/man1/*
 %exclude %{_mandir}/man1/gdal-config.1*
+%if %{with python}
+%{_bindir}/gdal2tiles
+%{_bindir}/gdal2xyz
+%{_bindir}/gdalattachpct
+%{_bindir}/gdal_calc
+%{_bindir}/gdalcompare
+%{_bindir}/gdal_edit
+%{_bindir}/gdal_fillnodata
+%{_bindir}/gdal_merge
+%{_bindir}/gdalmove
+%{_bindir}/gdal_pansharpen
+%{_bindir}/gdal_polygonize
+%{_bindir}/gdal_proximity
+%{_bindir}/gdal_retile
+%{_bindir}/gdal_sieve
+%{_bindir}/ogr_layer_algebra
+%{_bindir}/ogrmerge
+%{_bindir}/pct2rgb
+%{_bindir}/rgb2pct
+%endif
 # Python manpages excluded in -f gdal_python_manpages_excludes.txt
 
 %files libs
