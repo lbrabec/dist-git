@@ -110,7 +110,7 @@ BuildRequires: libgeotiff-devel
 BuildRequires: libgta-devel
 BuildRequires: libjpeg-devel
 BuildRequires: libkml-devel
-BuildRequires: liblerc-devel
+#BuildRequires: liblerc-devel
 BuildRequires: libpng-devel
 BuildRequires: libpq-devel
 %if %{with_spatialite}
@@ -414,6 +414,8 @@ cp -a %{SOURCE4} .
   -DGDAL_JAVA_INSTALL_DIR=%{_jnidir}/%{name} \
   -DGDAL_JAVA_JNI_INSTALL_DIR=%{_jnidir}/%{name} \
   -DGDAL_USE_JPEG12_INTERNAL=OFF \
+  -DGDAL_USE_LERC=OFF \ 
+  -DGDAL_USE_LERC_INTERNAL=OFF \
 %if %{without python}
   -DBUILD_PYTHON_BINDINGS=OFF \
 %endif
