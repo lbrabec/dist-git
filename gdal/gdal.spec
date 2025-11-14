@@ -414,7 +414,7 @@ cp -a %{SOURCE4} .
   -DGDAL_JAVA_INSTALL_DIR=%{_jnidir}/%{name} \
   -DGDAL_JAVA_JNI_INSTALL_DIR=%{_jnidir}/%{name} \
   -DGDAL_USE_JPEG12_INTERNAL=OFF \
-  -DGDAL_USE_LERC=OFF \ 
+  -DGDAL_USE_LERC=OFF \
   -DGDAL_USE_LERC_INTERNAL=OFF \
 %if %{without python3}
   -DBUILD_PYTHON_BINDINGS=OFF \
