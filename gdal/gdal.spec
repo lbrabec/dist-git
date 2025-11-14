@@ -416,7 +416,7 @@ cp -a %{SOURCE4} .
   -DGDAL_USE_JPEG12_INTERNAL=OFF \
   -DGDAL_USE_LERC=OFF \ 
   -DGDAL_USE_LERC_INTERNAL=OFF \
-%if %{without python}
+%if %{without python3}
   -DBUILD_PYTHON_BINDINGS=OFF \
 %endif
   -DENABLE_DEFLATE64=OFF
@@ -470,7 +470,7 @@ cp -a %{SOURCE3} %{buildroot}%{_bindir}/%{name}-config
 %endif
 
 
-%files %{?with_python:-f gdal_python_manpages_excludes.txt}
+%files %{?with_python3:-f gdal_python_manpages_excludes.txt}
 %{_bindir}/8211*
 %{_bindir}/gdaladdo
 %{_bindir}/gdalbuildvrt
@@ -505,7 +505,7 @@ cp -a %{SOURCE3} %{buildroot}%{_bindir}/%{name}-config
 %exclude %{_datadir}/bash-completion/completions/*.py
 %{_mandir}/man1/*
 %exclude %{_mandir}/man1/gdal-config.1*
-%if %{with python}
+%if %{with python3}
 %{_bindir}/gdal2tiles
 %{_bindir}/gdal2xyz
 %{_bindir}/gdalattachpct
