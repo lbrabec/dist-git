@@ -52,11 +52,11 @@
 
 # RHEL AI
 %bcond_with arrow
-
+%bcond_with gpsbabel
 
 Name:          gdal
 Version:       3.10.0
-Release:       3%{?dist}
+Release:       4.1%{?dist}
 Summary:       GIS file format library
 License:       MIT
 URL:           http://www.gdal.org
@@ -244,8 +244,10 @@ BuildRequires: javapackages-local
 BuildRequires: jpackage-utils
 %endif
 
+%if %{with gpsbabel}
 # Run time dependency for gpsbabel driver
 Requires:      gpsbabel
+%endif
 Requires:      %{name}-libs%{?_isa} = %{version}-%{release}
 
 
@@ -416,6 +418,9 @@ cp -a %{SOURCE4} .
   -DGDAL_USE_JPEG12_INTERNAL=OFF \
   -DGDAL_USE_LERC=OFF \
   -DGDAL_USE_LERC_INTERNAL=OFF \
+%if %{without gpsbabel}
+  -DOGR_ENABLE_DRIVER_GPSBABEL=OFF \
+%endif
 %if %{without python3}
   -DBUILD_PYTHON_BINDINGS=OFF \
 %endif
@@ -664,6 +669,12 @@ cp -a %{SOURCE3} %{buildroot}%{_bindir}/%{name}-config
 
 
 %changelog
+* Tue Nov 18 2025 Lukas Brabec <lbrabec@redhat.com> - 3.10.0-4.1
+- Don't require gpsbabel on RHEL
+
+* Fri Nov 14 2025 Lukas Brabec <lbrabec@redhat.com> - 3.10.0-4
+- Don't build python bindings, disable libarrow and liblerc
+
 * Wed Nov 20 2024 Sandro Mani <manisandro@gmail.com> - 3.10.0-3
 - Drop fedora conditional for gpsbabel requires
 
