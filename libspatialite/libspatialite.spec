@@ -6,7 +6,7 @@
 
 Name:          libspatialite
 Version:       5.0.1
-Release:       20%{?dist}
+Release:       21%{?dist}
 Summary:       Enables SQLite to support spatial data
 
 License:       MPLv1.1 or GPLv2+ or LGPLv2+
@@ -181,6 +181,9 @@ make check  -C build_native %{?_smp_mflags} || :
 %endif
 
 %changelog
+* Wed Nov 19 2025 Lukas Brabec <lbrabec@redhat.com> - 5.0.1-21
+- Rebuild with geos-1.13
+
 * Tue Nov 11 2025 Lukas Brabec <lbrabec@redhat.com> - 5.0.1-20
 - Rebuild with proj-9.6.0
 
