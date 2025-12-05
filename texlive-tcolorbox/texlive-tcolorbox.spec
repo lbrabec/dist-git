@@ -10,8 +10,8 @@ License:        LPPL-1.3c
 URL:            https://ctan.org/pkg/tcolorbox
 BuildArch:      noarch
 
-Source0:        http://ctan.math.illinois.edu/systems/texlive/tlnet/archive/tcolorbox.tar.xz
-Source1:        http://ctan.math.illinois.edu/systems/texlive/tlnet/archive/tcolorbox.doc.tar.xz
+Source0:        https://ctan.math.illinois.edu/systems/texlive/tlnet/archive/tcolorbox.tar.xz
+Source1:        https://ctan.math.illinois.edu/systems/texlive/tlnet/archive/tcolorbox.doc.tar.xz
 Source2:        lppl1.3.txt
 
 BuildRequires:  texlive-base
