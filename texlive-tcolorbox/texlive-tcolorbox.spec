@@ -1,27 +1,28 @@
-%global tl_version 2023
+%global source_date 20200406
+%global tl_version %{source_date}
 
 %{!?_texdir: %global _texdir %{_datadir}/texlive}
 
 Name:           texlive-tcolorbox
-Version:        6.8.0
+Version:        %{source_date}
 Release:        1%{?dist}
 Summary:        Coloured boxes, for LaTeX examples and theorems, etc.
-License:        LPPL-1.3c
+License:        LPPL-1.3
 URL:            https://ctan.org/pkg/tcolorbox
 BuildArch:      noarch
 
-Source0:        https://ctan.math.illinois.edu/systems/texlive/tlnet/archive/tcolorbox.tar.xz
-Source1:        https://ctan.math.illinois.edu/systems/texlive/tlnet/archive/tcolorbox.doc.tar.xz
+Source0:        https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/2020/tlnet-final/archive/tcolorbox.tar.xz
+Source1:        https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/2020/tlnet-final/archive/tcolorbox.doc.tar.xz
 Source2:        lppl1.3.txt
 
-BuildRequires:  texlive-base
-BuildRequires:  texlive-kpathsea
+Provides:       tex-tcolorbox = %{tl_version}
 
-Requires:       texlive-base
-Requires:       texlive-kpathsea
-Requires:       tex(environ.sty)
+Requires:       texlive-base 
+Requires:       texlive-kpathsea-bin, tex-kpathsea
 Requires:       tex(pgf.sty)
-Requires:       tex(tools.sty)
+Requires:       tex(verbatim.sty)
+Requires:       tex(environ.sty)
+Requires:       tex(etoolbox.sty)
 
 Provides:       tex(tcbbreakable.code.tex) = %{tl_version}
 Provides:       tex(tcbdocumentation.code.tex) = %{tl_version}
@@ -72,5 +73,5 @@ cp -a doc %{buildroot}%{_texdir}/texmf-dist/
 %doc %{_texdir}/texmf-dist/doc/latex/tcolorbox
 
 %changelog
-* Fri Dec 05 2025 Lukas Brabec <lbrabec@redhat.com> - 6.8.0-1
+* Fri Dec 05 2025 Lukas Brabec <lbrabec@redhat.com> - 20200406-1
 - Initial package for RHEL
