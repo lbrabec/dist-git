@@ -1,0 +1,15 @@
+# Hardinking duplicates is not worthwhile because these files are small and few
+# in number.
+addFilter(r"gn-doc\..*: files-duplicate /.*\.json")
+# This script is for documentation only; it has a weird polyglot self-exec
+# trick.
+addFilter(r"gn-doc\..*: (potential-bashisms|bin-sh-syntax-error) /.*/infra/recipes\.py")
+# These are all acceptable in the context of sample projects in the docs:
+addFilter(r"gn-doc\..*: (zero-length|version-control-internal-file) /.*/examples/")
+addFilter(r"gn-doc\..*: hidden-file-or-dir /.*/examples/.*/\.(gitignore|gn)")
+# This script is for looking at, not for executing:
+addFilter(r"gn-doc\..*: env-script-interpreter /.*/infra/config/main\.star .*")
+# This is as prescribed in
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Emacs/, and the
+# macro is not unexpanded in practice.
+addFilter(r"Possible unexpanded macro in: Requires:\s+emacs-filesystem")

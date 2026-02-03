@@ -1,0 +1,57 @@
+* Thu Jul 08 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1924-1.20210708git24e2f7df
+- Update to version 1924
+
+* Sun Jun 27 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1921-1.20210627git4d207c94
+- Update to version 1921
+
+* Wed Jun 23 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1920-1.20210623gitd924640c
+- Update to version 1920
+- Stop overriding optimization flags
+
+* Tue Jun 22 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1919-1.20210622gite9b84332
+- Update to version 1919
+
+* Wed Jun 16 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1916-1.20210616gitd2dce752
+- Update to version 1916
+
+* Tue May 11 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1910-2.20210511git39a87c0b
+- Rebase chromium-84.0.4147.105-gn-gcc-cleanup.patch as
+  gn-39a87c0b-gcc-cleanup.patch
+
+* Tue May 11 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1910-1.20210511git39a87c0b
+- Update to version 1910
+
+* Sun May 02 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1898-1.20210502git6771ce56
+- Update to version 1898
+
+* Sat Apr 10 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1897-1.20210410gitdba01723
+- Update to version 1897
+
+* Tue Apr 06 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1896-1.20210406gita95c8a3c
+- Update to version 1896
+- Do not use %%exclude for unpackaged files (RPM 4.17 compatibility)
+
+* Mon Mar 29 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1894-4.20210329gitb2e3d862
+- Update to version 1894
+
+* Wed Mar 17 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1893-3.20210314git64b3b940
+- Stop installing xemacs plugins
+  (https://fedoraproject.org/wiki/Changes/Deprecate_xemacs)
+
+* Wed Mar 17 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1893-2.20210314git64b3b940
+- Improved source URL based on package review feedback
+
+* Mon Mar  1 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1893-1.20210314git64b3b940
+- Update to version 1893
+
+* Mon Mar  1 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1891-1.20210127gitdfcbc6fe
+- Update to version 1891
+
+* Sun Jan  3 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1884-1.20210127git94bda7cc
+- Update to version 1884
+
+* Sun Jan  3 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 1876-1.20210103git0d67e272
+- Update to version 1876
+
+* Sat Dec 19 2020 Benjamin A. Beasley <code@musicinmybrain.net> - 1875-1.20201219git4e260f1d
+- Initial spec file
