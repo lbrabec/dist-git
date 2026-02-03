@@ -1,5 +1,5 @@
-# Build HTML docs from markdown using pandoc?
-%bcond html_docs 1
+# Build HTML docs from markdown using pandoc? No.
+%bcond_with html_docs
 
 Name:           gn
 # Upstream uses the number of commits in the git history as the version number.
@@ -26,10 +26,11 @@ Name:           gn
 # See https://gn.googlesource.com/gn/+log for the latest changes.
 %global commit 103f8b437f5e791e0aef9d5c372521a5d675fabb
 %global access 20260118
-%global shortcommit %{sub %{commit} 1 12}
+%dnl %global shortcommit %{sub %{commit} 1 12}
+%global shortcommit %(echo %{commit} | cut -c1-12)
 %global position 2318
 Version:        %{position}^%{access}.%{shortcommit}
-Release:        %autorelease
+Release:        1%{?dist}
 Summary:        Meta-build system that generates build files for Ninja
 
 # The entire source is BSD-3-Clause, except:
@@ -125,8 +126,9 @@ cp -vp misc/vim/README.md README-vim.md
 %py3_shebang_fix .
 
 
-%conf
+%build
 AR='gcc-ar'; export AR
+%set_build_flags
 # Treating warnings as errors is too strict for downstream builds.
 #
 # Both --use-icf and --use-lto add compiler flags that only work with clang++,
@@ -138,8 +140,6 @@ AR='gcc-ar'; export AR
     --no-strip \
     --no-static-libstdc++
 
-
-%build
 ninja -j %{_smp_build_ncpus} -C out -v
 
 %if %{with html_docs}
@@ -217,4 +217,5 @@ grep -E '^#define[[:blank:]]+LAST_COMMIT_POSITION[[:blank:]]+'\
 
 
 %changelog
-%autochangelog
+* Tue Feb 03 2026 Lukas Brabec <lbrabec@redhat.com> - 2318^20260118.103f8b437f5e-1
+- Rebuild for rhelai 3.4
